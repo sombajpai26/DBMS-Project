@@ -182,3 +182,128 @@ SELECT user.name, document.title, activity_log.action_type
 FROM activity_log
 JOIN user ON activity_log.user_id=user.user_id
 JOIN document ON activity_log.document_id=document.document_id;
+
+
+SELECT * FROM `user` WHERE role = 'Editor';
+
+
+SELECT * FROM document WHERE document_status = 'Active';
+
+
+SELECT * FROM collaboration WHERE permission_type = 'Edit';
+
+
+SELECT * FROM folder WHERE folder_name LIKE 'Project%';
+
+
+SELECT * FROM `comment` WHERE comment_text LIKE '%Nice%';
+
+
+SELECT * FROM `user` ORDER BY created_at DESC LIMIT 5;
+
+
+SELECT * FROM document ORDER BY last_modified DESC LIMIT 3;
+
+
+SELECT * FROM activity_log ORDER BY action_time DESC LIMIT 10;
+
+
+SELECT * FROM `version` ORDER BY modified_date DESC LIMIT 5;
+
+
+SELECT * FROM folder ORDER BY created_date DESC;
+
+
+SELECT u.name, d.title, d.document_status
+FROM `user` u
+JOIN document d ON u.user_id = d.owner_id;
+
+
+SELECT u.name, c.permission_type, d.title
+FROM collaboration c
+JOIN `user` u ON c.user_id = u.user_id
+JOIN document d ON c.document_id = d.document_id;
+
+
+SELECT d.title, f.folder_name
+FROM document d
+JOIN document_folder df ON d.document_id = df.document_id
+JOIN folder f ON df.folder_id = f.folder_id;
+
+
+SELECT u.name, v.content
+FROM `version` v
+JOIN `user` u ON v.modified_by = u.user_id;
+
+
+SELECT u.name, a.action_type, a.action_time
+FROM activity_log a
+JOIN `user` u ON a.user_id = u.user_id;
+
+
+SELECT role, COUNT(*) FROM `user` GROUP BY role;
+
+
+SELECT document_status, COUNT(*) FROM document GROUP BY document_status;
+
+
+SELECT user_id, COUNT(*) FROM collaboration GROUP BY user_id;
+
+
+SELECT document_id, COUNT(*) FROM `comment` GROUP BY document_id;
+
+
+SELECT user_id, COUNT(*) 
+FROM activity_log 
+GROUP BY user_id 
+HAVING COUNT(*) > 1;
+
+SELECT COUNT(*) AS total_users FROM `user`;
+
+
+SELECT COUNT(*) AS total_documents FROM document;
+
+
+SELECT MAX(created_date) FROM document;
+
+
+SELECT MIN(created_date) FROM document;
+
+
+SELECT COUNT(*) FROM `version`;
+
+
+SELECT name FROM `user`
+WHERE user_id IN (SELECT owner_id FROM document);
+
+
+SELECT title FROM document
+WHERE owner_id = (SELECT user_id FROM `user` WHERE name='Aryan');
+
+
+SELECT * FROM document
+WHERE document_id IN (
+    SELECT document_id FROM collaboration WHERE permission_type='Edit'
+);
+
+
+SELECT * FROM `user`
+WHERE user_id = (SELECT MAX(user_id) FROM `user`);
+
+
+SELECT * FROM `version`
+WHERE modified_by = (SELECT user_id FROM `user` WHERE name='Aryan');
+
+ (Most active user)
+SELECT user_id, COUNT(*) AS activity_count
+FROM activity_log
+GROUP BY user_id
+ORDER BY activity_count DESC
+LIMIT 1;
+
+ (Documents with most comments)
+SELECT document_id, COUNT(*) AS comment_count
+FROM `comment`
+GROUP BY document_id
+ORDER BY comment_count DESC
+LIMIT 1;
